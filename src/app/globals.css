@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #faf8f5;
+  --color-cream-deep: #f3efe8;
+  --color-ink: #1b1713;
+  --color-ink-soft: #5c544b;
+  --color-sepia: #93755a;
+  --color-line: rgba(27, 23, 19, 0.14);
+
+  --font-serif: var(--font-serif), "Georgia", serif;
+  --font-sans: var(--font-sans), "Helvetica Neue", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-sepia);
+  color: var(--color-cream);
+}
+
+section {
+  scroll-margin-top: 2rem;
+}
+
+/* Editorial small caps label */
+.caps {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.6875rem;
+  font-weight: 400;
+}
+
+/* Arch mask — signature shape of the layout */
+.arch {
+  border-radius: 100rem 100rem 0 0;
+}
+
+/* Thin double rule, like a newspaper masthead */
+.rule-double {
+  border-top: 1px solid var(--color-ink);
+  position: relative;
+}
+.rule-double::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--color-line);
+}
+
+/* Drop cap for the about section */
+.dropcap::first-letter {
+  font-family: var(--font-serif);
+  float: left;
+  font-size: 4.4em;
+  line-height: 0.78;
+  padding-right: 0.12em;
+  margin-top: 0.06em;
+  color: var(--color-sepia);
+}
+
+/* Underline-only form fields */
+.field {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  padding: 0.6rem 0;
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--color-ink);
+  transition: border-color 0.3s ease;
+}
+.field:focus {
+  outline: none;
+  border-bottom-color: var(--color-ink);
+}
+.field::placeholder {
+  color: rgba(27, 23, 19, 0.35);
+}
+
+/* Editorial text link with a sliding underline */
+.link-line {
+  position: relative;
+  display: inline-block;
+}
+.link-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-line:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-line::after {
+    transition: none;
+  }
+}
