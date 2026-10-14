@@ -9,15 +9,16 @@ type Props = {
   className?: string;
 };
 
+/** Spokojne wejście sekcji: krótki przesuw i rozjaśnienie, raz. Bez ruchu przy reduced motion. */
 export default function Reveal({ children, delay = 0, className }: Props) {
   const reduce = useReducedMotion();
 
   return (
     <motion.div
       className={className}
-      initial={reduce ? { opacity: 1 } : { opacity: 0, y: 28 }}
+      initial={reduce ? false : { opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
+      viewport={{ once: true, amount: 0.12 }}
       transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}

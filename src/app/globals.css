@@ -3,17 +3,23 @@
 @theme {
   --color-cream: #faf8f5;
   --color-cream-deep: #f3efe8;
+  --color-paper: #ebe4d8;
   --color-ink: #1b1713;
   --color-ink-soft: #5c544b;
-  --color-sepia: #93755a;
+  /* sepia przyciemniona do 5:1 na kremie, żeby nadawała się na drobny tekst */
+  --color-sepia: #7e604a;
+  --color-sepia-light: #b59a80;
   --color-line: rgba(27, 23, 19, 0.14);
 
   --font-serif: var(--font-serif), "Georgia", serif;
   --font-sans: var(--font-sans), "Helvetica Neue", sans-serif;
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -26,8 +32,19 @@ body {
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-weight: 300;
+  font-weight: 350;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 ::selection {
@@ -35,25 +52,36 @@ body {
   color: var(--color-cream);
 }
 
-section {
-  scroll-margin-top: 2rem;
+:focus-visible {
+  outline: 1px solid var(--color-ink);
+  outline-offset: 4px;
 }
 
-/* Editorial small caps label */
+section,
+[id] {
+  scroll-margin-top: 1.5rem;
+}
+
+/* Etykieta wersalikami: rytm magazynu, zawsze 12 px i szerokie światło */
 .caps {
   font-family: var(--font-sans);
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  line-height: 1.5;
   font-weight: 400;
 }
 
-/* Arch mask — signature shape of the layout */
+.tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Łuk: znak rozpoznawczy układu */
 .arch {
   border-radius: 100rem 100rem 0 0;
 }
 
-/* Thin double rule, like a newspaper masthead */
+/* Podwójna cienka linia jak w winiecie gazety */
 .rule-double {
   border-top: 1px solid var(--color-ink);
   position: relative;
@@ -67,39 +95,57 @@ section {
   border-top: 1px solid var(--color-line);
 }
 
-/* Drop cap for the about section */
+/* Inicjał w sekcji o mnie */
 .dropcap::first-letter {
   font-family: var(--font-serif);
   float: left;
-  font-size: 4.4em;
-  line-height: 0.78;
-  padding-right: 0.12em;
-  margin-top: 0.06em;
+  font-size: 4.6em;
+  line-height: 0.8;
+  padding-right: 0.1em;
+  margin-top: 0.05em;
   color: var(--color-sepia);
 }
 
-/* Underline-only form fields */
+/* Pola formularza: tylko dolna linia */
 .field {
   width: 100%;
+  min-height: 2.75rem;
   background: transparent;
   border: 0;
   border-bottom: 1px solid var(--color-line);
   border-radius: 0;
   padding: 0.6rem 0;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 350;
   color: var(--color-ink);
   transition: border-color 0.3s ease;
+  appearance: none;
 }
 .field:focus {
   outline: none;
   border-bottom-color: var(--color-ink);
+  box-shadow: 0 1px 0 0 var(--color-ink);
+}
+.field[aria-invalid="true"] {
+  border-bottom-color: #9a3b2a;
+  box-shadow: 0 1px 0 0 #9a3b2a;
 }
 .field::placeholder {
-  color: rgba(27, 23, 19, 0.35);
+  color: rgba(27, 23, 19, 0.45);
+}
+select.field {
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 9px) 52%,
+    calc(100% - 4px) 52%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 1.5rem;
+  cursor: pointer;
 }
 
-/* Editorial text link with a sliding underline */
+/* Link z wysuwanym podkreśleniem */
 .link-line {
   position: relative;
   display: inline-block;
@@ -114,15 +160,54 @@ section {
   background: currentColor;
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.4s var(--ease-editorial);
 }
-.link-line:hover::after {
+.link-line:hover::after,
+.link-line:focus-visible::after,
+.link-line[aria-current="true"]::after {
   transform: scaleX(1);
   transform-origin: left;
 }
 
+/* Przycisk z wypełnieniem od dołu: atrament wlewa się jak w kuwecie */
+.btn-ink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 1.75rem;
+  border: 1px solid var(--color-ink);
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.45s var(--ease-editorial);
+}
+.btn-ink::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-ink);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.45s var(--ease-editorial);
+}
+.btn-ink:hover,
+.btn-ink:focus-visible {
+  color: var(--color-cream);
+}
+.btn-ink:hover::before,
+.btn-ink:focus-visible::before {
+  transform: scaleY(1);
+}
+.btn-ink:active {
+  transform: translateY(1px);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .link-line::after {
+  .link-line::after,
+  .btn-ink,
+  .btn-ink::before {
     transition: none;
   }
 }

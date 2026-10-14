@@ -5,11 +5,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: `${site.name} — ${site.tagline} · ${site.city}`,
+  title: `${site.name} · ${site.tagline}, ${site.city}`,
   description:
-    "Reportaże ślubne, portrety i sesje rodzinne w Krakowie i całej Polsce. Naturalne, ciepłe kadry bez pozowania — fotografia, która dobrze się starzeje.",
+    "Reportaże ślubne, portrety i sesje rodzinne w Krakowie i całej Polsce. Naturalne, ciepłe kadry bez pozowania: fotografia, która dobrze się starzeje.",
   openGraph: {
-    title: `${site.name} — ${site.tagline}`,
+    title: `${site.name} · ${site.tagline}`,
     description:
       "Reportaże ślubne, portrety i sesje rodzinne w Krakowie. Naturalne kadry bez pozowania.",
     locale: "pl_PL",
@@ -38,7 +38,7 @@ const jsonLd = {
     },
     {
       "@type": "LocalBusiness",
-      name: `${site.name} — Fotografia`,
+      name: `${site.name} Fotografia`,
       url: site.url,
       email: site.email,
       image: `${site.url}/og.jpg`,

@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <>
       <Masthead />
-      <main>
+      <main id="tresc">
         <Hero />
         <Gallery />
         <About />
