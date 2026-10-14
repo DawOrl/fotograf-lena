@@ -19,9 +19,9 @@ export default function Hero() {
         ślub · portret · rodzina · {site.city}
       </p>
 
-      <div className="grid gap-y-10 lg:grid-cols-12 lg:grid-rows-[auto_1fr_auto] lg:gap-x-8 lg:gap-y-12">
+      <div className="grid gap-y-10 md:grid-cols-12 md:gap-x-8 lg:grid-rows-[auto_1fr_auto] lg:gap-y-12">
         {/* Tytuł */}
-        <div className="lg:col-span-7 lg:row-start-2 lg:self-end">
+        <div className="md:col-span-12 md:row-start-1 lg:col-span-6 lg:row-start-2 lg:self-end xl:col-span-7">
           <Reveal>
             <p className="caps text-sepia">Nº 1 · fotografia, która zostaje</p>
           </Reveal>
@@ -29,13 +29,13 @@ export default function Hero() {
         </div>
 
         {/* Kadr w łuku */}
-        <div className="lg:col-span-5 lg:col-start-8 lg:row-span-3 lg:row-start-1">
+        <div className="md:col-span-6 md:col-start-7 md:row-span-2 md:row-start-2 lg:row-span-3 lg:row-start-1 xl:col-span-5 xl:col-start-8">
           <Reveal delay={0.1}>
             <figure>
               <ParallaxImage
                 src={heroImage}
                 alt="Bukiet panny młodej z białymi tulipanami i paprocią na tle ciemnego garnituru, pod światło"
-                sizes="(max-width: 1024px) 92vw, 40vw"
+                sizes="(max-width: 768px) 92vw, (max-width: 1280px) 48vw, 40vw"
                 preload
                 develop
                 drift={40}
@@ -50,7 +50,7 @@ export default function Hero() {
         </div>
 
         {/* Wstęp i wezwania */}
-        <div className="lg:col-span-6 lg:row-start-3">
+        <div className="md:col-span-6 md:row-start-2 md:self-end lg:row-start-3">
           <Reveal delay={0.35}>
             <p className="max-w-md text-lg leading-relaxed text-ink-soft sm:text-xl sm:leading-relaxed">
               Reportaże ślubne i portrety pisane światłem. Bez pozowania,
@@ -70,7 +70,7 @@ export default function Hero() {
         {/* Spis treści numeru: skróty do kategorii galerii */}
         <nav
           aria-label="W tym numerze"
-          className="lg:col-span-6 lg:row-start-1 lg:self-start"
+          className="md:col-span-6 md:row-start-3 md:self-end lg:row-start-1 lg:self-start"
         >
           <Reveal delay={0.2}>
             <p className="caps text-ink-soft">W tym numerze</p>
@@ -81,13 +81,13 @@ export default function Hero() {
                   <li key={c.id} className="border-b border-line">
                     <a
                       href={`#${c.anchor}`}
-                      className="group grid min-h-12 grid-cols-[2rem_1fr_auto] items-baseline gap-x-3 py-2.5 sm:grid-cols-[2.5rem_auto_1fr_auto]"
+                      className="group grid min-h-12 grid-cols-[2rem_1fr_auto] items-baseline gap-x-3 py-2.5 lg:grid-cols-[2.5rem_auto_1fr_auto]"
                     >
                       <span className="caps tabular text-sepia">0{i + 1}</span>
                       <span className="font-serif text-xl transition-transform duration-500 ease-[var(--ease-editorial)] group-hover:translate-x-1 sm:text-2xl">
                         {c.label}
                       </span>
-                      <span className="hidden font-serif italic text-ink-soft sm:block">
+                      <span className="hidden font-serif italic text-ink-soft lg:block">
                         {c.note}
                       </span>
                       <span className="caps tabular text-ink-soft">

@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import SectionHead from "@/components/SectionHead";
 import Lightbox from "@/components/Lightbox";
-import { categories, photos, type Category, type Photo } from "@/data/content";
+import { categories, photos, site, type Category, type Photo } from "@/data/content";
 
 type Filter = Category | "all";
 
@@ -30,7 +30,7 @@ function useColumns() {
 }
 
 /* ---------- masonry: każdy kadr trafia do najkrótszej kolumny, kolejność czytania zostaje ---------- */
-const CAPTION = 0.11; // wysokość podpisu w jednostkach szerokości kolumny
+const CAPTION = 0.15; // wysokość podpisu w jednostkach szerokości kolumny
 const MIDDLE_OFFSET = 0.2; // środkowa kolumna startuje niżej, jak przesunięta szpalta
 
 function distribute(list: Photo[], cols: number) {
@@ -41,7 +41,10 @@ function distribute(list: Photo[], cols: number) {
     columns[target].push({ photo, index });
     heights[target] += photo.src.height / photo.src.width + CAPTION;
   });
-  return columns;
+  // najkrótsza kolumna dostaje notkę na końcu, jeśli zostaje w niej wyraźna dziura
+  const shortest = heights.indexOf(Math.min(...heights));
+  const gap = Math.max(...heights) - heights[shortest];
+  return { columns, noteIn: cols > 1 && gap > 0.35 ? shortest : -1 };
 }
 
 export default function Gallery() {
@@ -55,7 +58,7 @@ export default function Gallery() {
     () => (filter === "all" ? photos : photos.filter((p) => p.category === filter)),
     [filter],
   );
-  const columns = useMemo(() => distribute(visible, cols), [visible, cols]);
+  const { columns, noteIn } = useMemo(() => distribute(visible, cols), [visible, cols]);
 
   const counts = useMemo(() => {
     const c: Record<Filter, number> = { all: photos.length, slub: 0, portret: 0, rodzina: 0 };
@@ -182,20 +185,34 @@ export default function Gallery() {
                         className="h-auto w-full transition-transform duration-[900ms] ease-[var(--ease-editorial)] motion-safe:group-hover:scale-[1.035]"
                       />
                     </div>
-                    <span className="mt-3 grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 sm:flex sm:justify-between sm:gap-4">
+                    <span className="mt-3 grid grid-cols-[2.25rem_1fr] items-baseline gap-y-1">
                       <span className="caps tabular text-sepia">
                         {String(photo.nr).padStart(3, "0")}
                       </span>
-                      <span className="font-serif text-[1.0625rem] italic leading-snug sm:mr-auto">
+                      <span className="font-serif text-[1.0625rem] italic leading-snug">
                         {photo.title}
                       </span>
-                      <span className="caps col-start-2 text-ink-soft sm:shrink-0 sm:text-right">
-                        {photo.place}
-                      </span>
+                      <span className="caps col-start-2 text-ink-soft">{photo.place}</span>
                     </span>
                   </button>
                 </div>
               ))}
+              {ci === noteIn && (
+                <aside className="border-t border-ink pt-4">
+                  <p className="caps text-sepia">Ciąg dalszy</p>
+                  <p className="mt-3 font-serif text-2xl italic leading-snug">
+                    Więcej kadrów i całe historie pokazuję na Instagramie.
+                  </p>
+                  <a
+                    href={site.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="caps mt-4 inline-flex min-h-11 items-center"
+                  >
+                    <span className="link-line">@{site.instagram}</span>
+                  </a>
+                </aside>
+              )}
             </div>
           ))}
         </motion.div>

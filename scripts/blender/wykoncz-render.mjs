@@ -8,7 +8,7 @@ import sharp from "sharp";
 
 const [input, output] = process.argv.slice(2);
 const SHADOW = [58, 42, 30]; // ciepły brąz w tonie sepii strony
-const FADE = 0.09; // szerokość wygaszania przy krawędziach, ułamek boku
+const FADE = 0.16; // szerokość wygaszania przy krawędziach, ułamek boku
 
 const { data, info } = await sharp(input).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
 const { width, height } = info;
@@ -24,7 +24,8 @@ for (let y = 0; y < height; y++) {
       data[i] = Math.round(SHADOW[0] * (1 - t) + data[i] * t);
       data[i + 1] = Math.round(SHADOW[1] * (1 - t) + data[i + 1] * t);
       data[i + 2] = Math.round(SHADOW[2] * (1 - t) + data[i + 2] * t);
-      a = a * (0.75 + 0.25 * t);
+      // lżejszy cień, a najsłabsza okluzja otoczenia znika całkiem (bez "prostokąta" za obiektem)
+      a = 255 * Math.pow((a * (0.75 + 0.25 * t)) / 255, 1.35);
     }
     const ex = Math.min(x / width, (width - 1 - x) / width) / FADE;
     const ey = Math.min(y / height, (height - 1 - y) / height) / FADE;
