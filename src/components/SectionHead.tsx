@@ -7,9 +7,11 @@ type Props = {
   /** treść po prawej stronie nagłówka (np. krótki wstęp) */
   aside?: React.ReactNode;
   id?: string;
+  /** szerszy tytuł (dłuższe zdanie mieści się w dwóch liniach) */
+  wide?: boolean;
 };
 
-export default function SectionHead({ nr, label, title, aside, id }: Props) {
+export default function SectionHead({ nr, label, title, aside, id, wide }: Props) {
   return (
     <Reveal>
       <div className="flex items-baseline justify-between border-t border-ink pt-3">
@@ -28,7 +30,9 @@ export default function SectionHead({ nr, label, title, aside, id }: Props) {
       <div className="mt-6 grid gap-6 lg:grid-cols-12 lg:items-end">
         <h2
           id={id}
-          className="font-serif text-[2.5rem] leading-[1.08] tracking-[-0.015em] sm:text-5xl lg:col-span-7 lg:text-[3.5rem]"
+          className={`font-serif text-[2.5rem] leading-[1.08] tracking-[-0.015em] sm:text-5xl lg:text-[3.5rem] ${
+            wide ? "lg:col-span-10" : "lg:col-span-7"
+          }`}
         >
           {title}
         </h2>

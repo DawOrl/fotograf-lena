@@ -11,6 +11,7 @@ export default function About() {
           nr="03"
           label="O mnie"
           id="o-mnie-title"
+          wide
           title={<em className="text-sepia">{oMnie.heading}</em>}
         />
 
