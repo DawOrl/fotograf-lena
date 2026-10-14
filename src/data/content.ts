@@ -1,20 +1,22 @@
 import type { StaticImageData } from "next/image";
 
-import hero from "../../public/gallery/hero.jpg";
-import lena from "../../public/gallery/lena.jpg";
-import slub01 from "../../public/gallery/slub-01.jpg";
-import slub02 from "../../public/gallery/slub-02.jpg";
-import slub03 from "../../public/gallery/slub-03.jpg";
-import slub04 from "../../public/gallery/slub-04.jpg";
-import slub05 from "../../public/gallery/slub-05.jpg";
-import slub06 from "../../public/gallery/slub-06.jpg";
-import portret01 from "../../public/gallery/portret-01.jpg";
-import portret02 from "../../public/gallery/portret-02.jpg";
-import portret03 from "../../public/gallery/portret-03.jpg";
-import portret04 from "../../public/gallery/portret-04.jpg";
-import rodzina01 from "../../public/gallery/rodzina-01.jpg";
-import rodzina02 from "../../public/gallery/rodzina-02.jpg";
-import rodzina03 from "../../public/gallery/rodzina-03.jpg";
+import hero from "../../public/gallery/hero.webp";
+import lena from "../../public/gallery/lena.webp";
+import slubPalma from "../../public/gallery/slub-palma.webp";
+import slubGuziki from "../../public/gallery/slub-guziki.webp";
+import slubWelon from "../../public/gallery/slub-welon.webp";
+import slubTaniec from "../../public/gallery/slub-taniec.webp";
+import slubTatry from "../../public/gallery/slub-tatry.webp";
+import slubSad from "../../public/gallery/slub-sad.webp";
+import slubBrama from "../../public/gallery/slub-brama.webp";
+import portretJulia from "../../public/gallery/portret-julia.webp";
+import portretHalina from "../../public/gallery/portret-halina.webp";
+import portretEwa from "../../public/gallery/portret-ewa.webp";
+import portretWeronika from "../../public/gallery/portret-weronika.webp";
+import rodzinaLaka from "../../public/gallery/rodzina-laka.webp";
+import rodzinaNiedziela from "../../public/gallery/rodzina-niedziela.webp";
+import rodzinaWydmy from "../../public/gallery/rodzina-wydmy.webp";
+import klisza from "../../public/render/klisza.webp";
 
 export const site = {
   name: "Lena Czarnecka",
@@ -29,16 +31,19 @@ export const site = {
 
 export const heroImage = hero;
 export const portraitImage = lena;
+export const filmStill = klisza;
 
 export type Category = "slub" | "portret" | "rodzina";
 
-export const categories: { id: Category; label: string }[] = [
-  { id: "slub", label: "Śluby" },
-  { id: "portret", label: "Portrety" },
-  { id: "rodzina", label: "Rodzinne" },
+export const categories: { id: Category; label: string; anchor: string; note: string }[] = [
+  { id: "slub", label: "Śluby", anchor: "sluby", note: "reportaż całego dnia" },
+  { id: "portret", label: "Portrety", anchor: "portrety", note: "plener i studio" },
+  { id: "rodzina", label: "Rodzinne", anchor: "rodzinne", note: "dom, łąka, morze" },
 ];
 
 export type Photo = {
+  /** stały numer kadru, jak na stykówce: nie zmienia się przy filtrowaniu */
+  nr: number;
   src: StaticImageData;
   alt: string;
   title: string;
@@ -46,105 +51,115 @@ export type Photo = {
   category: Category;
 };
 
-export const photos: Photo[] = [
+const raw: Omit<Photo, "nr">[] = [
   {
-    src: slub01,
+    src: slubPalma,
     alt: "Para młoda idzie pod palmą o zmierzchu, panna młoda trzyma bukiet",
-    title: "Marta & Jan",
+    title: "Marta i Jan",
     place: "Taormina, Sycylia",
     category: "slub",
   },
   {
-    src: portret01,
+    src: portretJulia,
     alt: "Portret kobiety w prążkowanej koszuli w złotym świetle zachodu",
     title: "Julia",
     place: "Zakrzówek, złota godzina",
     category: "portret",
   },
   {
-    src: slub03,
-    alt: "Dłonie pary młodej z obrączkami na tle bukietu",
-    title: "Detal — obrączki",
+    src: slubGuziki,
+    alt: "Dłonie mamy zapinają rząd drobnych guzików na plecach sukni ślubnej, poranne światło z okna",
+    title: "Ania i Paweł: ostatni guzik",
     place: "Dwór w Tomaszowicach",
     category: "slub",
   },
   {
-    src: rodzina01,
-    alt: "Wielopokoleniowa rodzina trzyma się za ręce na plaży o zachodzie słońca",
-    title: "Trzy pokolenia",
-    place: "Bałtyk, sierpień",
-    category: "rodzina",
-  },
-  {
-    src: slub02,
-    alt: "Para młoda na kamienistej plaży, welon owinięty wokół obojga",
-    title: "Gosia & Tomek",
-    place: "Klif w Orłowie",
-    category: "slub",
-  },
-  {
-    src: portret02,
-    alt: "Roześmiana kobieta w bordowej sukience, portret miejski",
-    title: "Natalia",
-    place: "Kazimierz, Kraków",
-    category: "portret",
-  },
-  {
-    src: slub05,
-    alt: "Para młoda idzie przez górską przełęcz o świcie",
-    title: "Kasia & Michał — plener",
-    place: "Tatry Zachodnie",
-    category: "slub",
-  },
-  {
-    src: rodzina02,
-    alt: "Rodzice z trójką dzieci idą gęsiego przez letnią łąkę",
+    src: rodzinaLaka,
+    alt: "Rodzice z trójką dzieci idą gęsiego przez letnią łąkę, trzymając się za ręce",
     title: "Rodzina K.",
     place: "Łąki pod Krakowem",
     category: "rodzina",
   },
   {
-    src: slub04,
-    alt: "Pocałunek pary młodej w deszczu płatków kwiatów wśród gości",
-    title: "Ania & Paweł",
+    src: slubTaniec,
+    alt: "Pierwszy taniec pary młodej w drewnianej stodole pod girlandą żarówek, goście jako sylwetki na pierwszym planie",
+    title: "Ania i Paweł: pierwszy taniec",
     place: "Dwór w Tomaszowicach",
     category: "slub",
   },
   {
-    src: portret03,
-    alt: "Portret uśmiechniętej kobiety o blond włosach w wieczornym świetle ogrodu",
+    src: portretHalina,
+    alt: "Starsza kobieta o srebrnych włosach z uśmiechem patrzy na bukiet dalii w swoim ogródku",
+    title: "Pani Halina",
+    place: "Ogródki działkowe, Nowa Huta",
+    category: "portret",
+  },
+  {
+    src: slubWelon,
+    alt: "Para młoda na kamienistej plaży, długi welon rozwiany wokół obojga",
+    title: "Gosia i Tomek",
+    place: "Klif w Orłowie",
+    category: "slub",
+  },
+  {
+    src: rodzinaNiedziela,
+    alt: "Dwoje małych dzieci w piżamach skacze po łóżku z lnianą pościelą w porannym słońcu",
+    title: "Niedziela w domu",
+    place: "Sesja domowa, Krowodrza",
+    category: "rodzina",
+  },
+  {
+    src: slubSad,
+    alt: "Długi stół weselny w sadzie po kolacji: lniany obrus, świece, polne kwiaty i kieliszki w późnym świetle",
+    title: "Ania i Paweł: po kolacji",
+    place: "Sad przy dworze w Tomaszowicach",
+    category: "slub",
+  },
+  {
+    src: portretEwa,
+    alt: "Portret uśmiechniętej kobiety o jasnych włosach w wieczornym świetle ogrodu",
     title: "Pani Ewa",
     place: "Wola Justowska",
     category: "portret",
   },
   {
-    src: rodzina03,
-    alt: "Mama z dwójką małych dzieci na kanapie podczas sesji domowej",
-    title: "Niedziela w domu",
-    place: "Sesja lifestyle",
+    src: slubTatry,
+    alt: "Para młoda idzie grzbietem gór o świcie, daleko w kadrze pod jasnym niebem",
+    title: "Kasia i Michał, plener",
+    place: "Tatry Zachodnie",
+    category: "slub",
+  },
+  {
+    src: rodzinaWydmy,
+    alt: "Tata z synkiem na barana i mama z kapeluszem w dłoni idą ścieżką przez wydmy porośnięte trawą",
+    title: "Wakacje nad morzem",
+    place: "Wydmy w Dębkach",
     category: "rodzina",
   },
   {
-    src: portret04,
+    src: portretWeronika,
     alt: "Studyjny portret kobiety w czarnej bluzce na grafitowym tle",
     title: "Weronika",
     place: "Studio, Podgórze",
     category: "portret",
   },
   {
-    src: slub06,
-    alt: "Kompozycja kwiatowa na drewnianej bramie ślubnej w plenerze",
+    src: slubBrama,
+    alt: "Bukiet z różami i zielenią przewiązany na lnianej bramie ślubnej w plenerze",
     title: "Ceremonia w plenerze",
     place: "Zamek Ogrodzieniec",
     category: "slub",
   },
 ];
 
+export const photos: Photo[] = raw.map((p, i) => ({ ...p, nr: i + 1 }));
+
 export type Pakiet = {
   nr: string;
   name: string;
   sub: string;
   includes: string[];
+  /** cena "od", bez słowa "od" (dodaje je widok) */
   price: string;
 };
 
@@ -159,7 +174,7 @@ export const pakiety: Pakiet[] = [
       "galeria online na 12 miesięcy",
       "przewodnik „jak się przygotować”",
     ],
-    price: "od 650 zł",
+    price: "650\u00a0zł",
   },
   {
     nr: "02",
@@ -171,7 +186,7 @@ export const pakiety: Pakiet[] = [
       "galeria online + pendrive w pudełku",
       "mini-plener w dniu ślubu",
     ],
-    price: "od 4 900 zł",
+    price: "4\u00a0900\u00a0zł",
   },
   {
     nr: "03",
@@ -183,7 +198,7 @@ export const pakiety: Pakiet[] = [
       "album 30×30 ręcznie oprawiany",
       "dwie fotoksiążki dla rodziców",
     ],
-    price: "od 7 400 zł",
+    price: "7\u00a0400\u00a0zł",
   },
 ];
 
@@ -192,13 +207,13 @@ export type Opinia = { quote: string; author: string; context: string };
 export const opinie: Opinia[] = [
   {
     quote:
-      "Lena jest niewidzialna w najlepszym możliwym sensie. Przez cały dzień nie czuliśmy obiektywu, a potem w galerii odnaleźliśmy każdą emocję — także te, o których nie wiedzieliśmy.",
+      "Lena jest niewidzialna w najlepszym możliwym sensie. Przez cały dzień nie czuliśmy obiektywu, a potem w galerii odnaleźliśmy każdą emocję, także te, o których nie wiedzieliśmy.",
     author: "Marta i Jan",
     context: "reportaż ślubny, Sycylia",
   },
   {
     quote:
-      "Bałam się sesji jak ognia, bo „nie wychodzę na zdjęciach”. Po dziesięciu minutach zapomniałam, że ktoś mnie fotografuje. Wyszłam ja — tylko w wersji, którą wreszcie lubię.",
+      "Bałam się sesji jak ognia, bo „nie wychodzę na zdjęciach”. Po dziesięciu minutach zapomniałam, że ktoś mnie fotografuje. Wyszłam ja, tylko w wersji, którą wreszcie lubię.",
     author: "Julia",
     context: "sesja portretowa",
   },
@@ -213,12 +228,12 @@ export const opinie: Opinia[] = [
 export const oMnie = {
   heading: "Fotografuję tak, żeby za dwadzieścia lat pachniało tamtym dniem.",
   paragraphs: [
-    "Nazywam się Lena Czarnecka i od dziewięciu lat dokumentuję śluby, portrety i codzienność rodzin — głównie w Krakowie, ale walizka zawsze stoi spakowana. Zaczynałam od analogowej lustrzanki taty; do dziś najbardziej interesuje mnie to, co dzieje się między pozowanymi kadrami: spojrzenia, dłonie, łza, której nikt nie zdążył wytrzeć.",
-    "Pracuję reportażowo. Nie ustawiam, nie poprawiam rzeczywistości — towarzyszę jej dyskretnie i czekam na moment. Edytuję w ciepłych, miękkich tonacjach inspirowanych filmem analogowym, bo wierzę, że zdjęcia mają się dobrze starzeć — jak dobre wino i dobre małżeństwa.",
+    "Nazywam się Lena Czarnecka i od dziewięciu lat dokumentuję śluby, portrety i codzienność rodzin. Głównie w Krakowie, ale walizka zawsze stoi spakowana. Zaczynałam od analogowej lustrzanki taty; do dziś najbardziej interesuje mnie to, co dzieje się między pozowanymi kadrami: spojrzenia, dłonie, łza, której nikt nie zdążył wytrzeć.",
+    "Pracuję reportażowo. Nie ustawiam i nie poprawiam rzeczywistości: towarzyszę jej dyskretnie i czekam na moment. Edytuję w ciepłych, miękkich tonacjach inspirowanych filmem analogowym, bo wierzę, że zdjęcia mają się dobrze starzeć. Jak dobre wino i dobre małżeństwa.",
   ],
   facts: [
     { value: "200+", label: "reportaży ślubnych" },
     { value: "9", label: "lat za obiektywem" },
-    { value: "60 000", label: "kadrów rocznie" },
+    { value: "60\u00a0000", label: "kadrów rocznie" },
   ],
 };
