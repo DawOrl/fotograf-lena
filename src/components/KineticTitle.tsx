@@ -7,14 +7,12 @@ const ease = [0.22, 1, 0.36, 1] as const;
 /** Nazwisko wjeżdża linia po linii spod maski, jak tytuł składany na kolumnie. */
 export default function KineticTitle({ id }: { id: string }) {
   const reduce = useReducedMotion();
-  const line = (delay: number) =>
-    reduce
-      ? {}
-      : {
-          initial: { y: "105%" },
-          animate: { y: "0%" },
-          transition: { duration: 1.1, delay, ease },
-        };
+  // Stan początkowy jest taki sam na serwerze i w przeglądarce; przy reduced motion przejście trwa 0 s.
+  const line = (delay: number) => ({
+    initial: { y: "105%" },
+    animate: { y: "0%" },
+    transition: reduce ? { duration: 0 } : { duration: 1.1, delay, ease },
+  });
 
   return (
     <h1
