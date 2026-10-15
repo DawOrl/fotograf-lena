@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SectionHead from "@/components/SectionHead";
 import Lightbox from "@/components/Lightbox";
 import { categories, photos, site, type Category, type Photo } from "@/data/content";
@@ -14,20 +14,13 @@ const anchorToFilter: Record<string, Filter> = Object.fromEntries([
   ...categories.map((c) => [c.anchor, c.id]),
 ]);
 
-/* ---------- liczba kolumn wg szerokości ekranu (SSR: 3, po hydracji: realna) ---------- */
-const queries = ["(min-width: 1024px)", "(min-width: 640px)"] as const;
-
-function subscribe(cb: () => void) {
-  const lists = queries.map((q) => window.matchMedia(q));
-  lists.forEach((l) => l.addEventListener("change", cb));
-  return () => lists.forEach((l) => l.removeEventListener("change", cb));
-}
-const getColumns = () =>
-  window.matchMedia(queries[0]).matches ? 3 : window.matchMedia(queries[1]).matches ? 2 : 1;
-
-function useColumns() {
-  return useSyncExternalStore(subscribe, getColumns, () => 3);
-}
+/* Trzy układy (1, 2 i 3 kolumny) są liczone z góry i przełączane w CSS, więc HTML z serwera
+   jest od razu właściwy dla każdej szerokości: bez przeskoku po hydracji i z kolejnością czytania. */
+const LAYOUTS = [
+  { cols: 1, className: "sm:hidden" },
+  { cols: 2, className: "hidden sm:grid sm:grid-cols-2 lg:hidden" },
+  { cols: 3, className: "hidden lg:grid lg:grid-cols-3 lg:gap-x-8" },
+] as const;
 
 /* ---------- masonry: każdy kadr trafia do najkrótszej kolumny, kolejność czytania zostaje ---------- */
 const CAPTION = 0.15; // wysokość podpisu w jednostkach szerokości kolumny
@@ -51,14 +44,16 @@ export default function Gallery() {
   const [filter, setFilter] = useState<Filter>("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const reduce = useReducedMotion();
-  const cols = useColumns();
-  const thumbs = useRef(new Map<number, HTMLButtonElement>());
+  const sectionRef = useRef<HTMLElement>(null);
 
   const visible = useMemo(
     () => (filter === "all" ? photos : photos.filter((p) => p.category === filter)),
     [filter],
   );
-  const { columns, noteIn } = useMemo(() => distribute(visible, cols), [visible, cols]);
+  const layouts = useMemo(
+    () => LAYOUTS.map((l) => ({ ...l, ...distribute(visible, l.cols) })),
+    [visible],
+  );
 
   const counts = useMemo(() => {
     const c: Record<Filter, number> = { all: photos.length, slub: 0, portret: 0, rodzina: 0 };
@@ -88,13 +83,19 @@ export default function Gallery() {
     setLightboxIndex(null);
     // fokus wraca do miniatury kadru, który był oglądany jako ostatni
     // (po zdjęciu "inert" z reszty strony, stąd krótkie opóźnienie)
-    if (nr !== undefined) window.setTimeout(() => thumbs.current.get(nr)?.focus(), 60);
+    if (nr === undefined) return;
+    window.setTimeout(() => {
+      // miniatura jest w każdym z trzech układów; fokus dostaje ta widoczna
+      const candidates = sectionRef.current?.querySelectorAll<HTMLButtonElement>(`[data-kadr="${nr}"]`);
+      Array.from(candidates ?? []).find((el) => el.getClientRects().length > 0)?.focus();
+    }, 60);
   }, [lightboxIndex, visible]);
 
   const filters: { id: Filter; label: string }[] = [{ id: "all", label: "Wszystkie" }, ...categories];
 
   return (
     <section
+      ref={sectionRef}
       id="portfolio"
       aria-labelledby="portfolio-title"
       className="relative mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28"
@@ -155,64 +156,68 @@ export default function Gallery() {
 
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          key={`${filter}-${cols}`}
+          key={filter}
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? undefined : { opacity: 0, transition: { duration: 0.2 } }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-10 grid gap-x-6 sm:mt-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8"
+          className="mt-10 sm:mt-12"
         >
-          {columns.map((column, ci) => (
-            <div key={ci} className={`flex flex-col gap-y-10 ${cols === 3 && ci === 1 ? "lg:pt-20" : ""}`}>
-              {column.map(({ photo, index }) => (
-                <div key={photo.nr}>
-                  <button
-                    ref={(el) => {
-                      if (el) thumbs.current.set(photo.nr, el);
-                      else thumbs.current.delete(photo.nr);
-                    }}
-                    type="button"
-                    onClick={() => setLightboxIndex(index)}
-                    className="group block w-full cursor-zoom-in text-left"
-                    aria-label={`Kadr ${String(photo.nr).padStart(3, "0")}: ${photo.title}, ${photo.place}. Otwórz podgląd`}
-                  >
-                    <div className="overflow-hidden bg-cream-deep">
-                      <Image
-                        src={photo.src}
-                        alt={photo.alt}
-                        sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw"
-                        placeholder="blur"
-                        className="h-auto w-full transition-transform duration-[900ms] ease-[var(--ease-editorial)] motion-safe:group-hover:scale-[1.035]"
-                      />
+          {layouts.map(({ cols, className, columns, noteIn }) => (
+            <div key={cols} className={`gap-x-6 ${className}`}>
+              {columns.map((column, ci) => (
+                <div
+                  key={ci}
+                  className={`flex flex-col gap-y-10 ${cols === 3 && ci === 1 ? "pt-20" : ""}`}
+                >
+                  {column.map(({ photo, index }) => (
+                    <div key={photo.nr}>
+                      <button
+                        data-kadr={photo.nr}
+                        type="button"
+                        onClick={() => setLightboxIndex(index)}
+                        className="group block w-full cursor-zoom-in text-left"
+                        aria-label={`Kadr ${String(photo.nr).padStart(3, "0")}: ${photo.title}, ${photo.place}. Otwórz podgląd`}
+                      >
+                        <div className="overflow-hidden bg-cream-deep">
+                          <Image
+                            src={photo.src}
+                            alt={photo.alt}
+                            sizes={cols === 1 ? "92vw" : cols === 2 ? "46vw" : "(max-width: 1280px) 30vw, 380px"}
+                            placeholder="blur"
+                            className="h-auto w-full transition-transform duration-[900ms] ease-[var(--ease-editorial)] motion-safe:group-hover:scale-[1.035]"
+                          />
+                        </div>
+                        <span className="mt-3 grid grid-cols-[2.25rem_1fr] items-baseline gap-y-1">
+                          <span className="caps tabular text-sepia">
+                            {String(photo.nr).padStart(3, "0")}
+                          </span>
+                          <span className="font-serif text-[1.0625rem] italic leading-snug">
+                            {photo.title}
+                          </span>
+                          <span className="caps col-start-2 text-ink-soft">{photo.place}</span>
+                        </span>
+                      </button>
                     </div>
-                    <span className="mt-3 grid grid-cols-[2.25rem_1fr] items-baseline gap-y-1">
-                      <span className="caps tabular text-sepia">
-                        {String(photo.nr).padStart(3, "0")}
-                      </span>
-                      <span className="font-serif text-[1.0625rem] italic leading-snug">
-                        {photo.title}
-                      </span>
-                      <span className="caps col-start-2 text-ink-soft">{photo.place}</span>
-                    </span>
-                  </button>
+                  ))}
+                  {ci === noteIn && (
+                    <aside className="border-t border-ink pt-4">
+                      <p className="caps text-sepia">Ciąg dalszy</p>
+                      <p className="mt-3 font-serif text-2xl italic leading-snug">
+                        Więcej kadrów i całe historie pokazuję na Instagramie.
+                      </p>
+                      <a
+                        href={site.instagramUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="caps mt-4 inline-flex min-h-11 items-center"
+                      >
+                        <span className="link-line">@{site.instagram}</span>
+                      </a>
+                    </aside>
+                  )}
                 </div>
               ))}
-              {ci === noteIn && (
-                <aside className="border-t border-ink pt-4">
-                  <p className="caps text-sepia">Ciąg dalszy</p>
-                  <p className="mt-3 font-serif text-2xl italic leading-snug">
-                    Więcej kadrów i całe historie pokazuję na Instagramie.
-                  </p>
-                  <a
-                    href={site.instagramUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="caps mt-4 inline-flex min-h-11 items-center"
-                  >
-                    <span className="link-line">@{site.instagram}</span>
-                  </a>
-                </aside>
-              )}
             </div>
           ))}
         </motion.div>

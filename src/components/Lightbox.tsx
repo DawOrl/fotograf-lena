@@ -24,6 +24,8 @@ export default function Lightbox({ photos, index, onClose, onNavigate }: Props) 
   const closeRef = useRef<HTMLButtonElement>(null);
   const reduce = useReducedMotion();
   const [direction, setDirection] = useState(0);
+  // koniec przeciągania: przez chwilę ignorujemy klik w tło, żeby szybki swipe nie zamknął podglądu
+  const dragEndedAt = useRef(0);
 
   const go = useCallback(
     (step: number) => {
@@ -75,6 +77,7 @@ export default function Lightbox({ photos, index, onClose, onNavigate }: Props) 
   }, [open]);
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
+    dragEndedAt.current = performance.now();
     const swipe = info.offset.x + info.velocity.x * 0.2;
     if (swipe < -70) go(1);
     else if (swipe > 70) go(-1);
@@ -119,7 +122,12 @@ export default function Lightbox({ photos, index, onClose, onNavigate }: Props) 
           </div>
 
           {/* Scena: klik poza zdjęciem zamyka */}
-          <div className="relative min-h-0 flex-1" onClick={onClose}>
+          <div
+            className="relative min-h-0 flex-1"
+            onClick={() => {
+              if (performance.now() - dragEndedAt.current > 200) onClose();
+            }}
+          >
             <AnimatePresence initial={false} custom={direction} mode="popLayout">
               <motion.div
                 key={photo.nr}
